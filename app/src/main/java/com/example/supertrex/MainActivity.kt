@@ -1,47 +1,34 @@
 package com.example.supertrex
 
 import android.os.Bundle
+import android.widget.Button
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.example.supertrex.ui.theme.SuperTrexTheme
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var gameView: GameView
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContent {
-            SuperTrexTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
-            }
+
+        setContentView(R.layout.activity_main)
+
+        gameView = findViewById(R.id.gameView)
+
+        val btnJump = findViewById<Button>(R.id.btnJump)
+        val btnDown = findViewById<Button>(R.id.btnSlide)
+        val btnPause = findViewById<Button>(R.id.btnPause)
+
+        btnJump.setOnClickListener {
+            gameView.jump()
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+        btnDown.setOnClickListener {
+            gameView.duck()
+        }
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SuperTrexTheme {
-        Greeting("Android")
+        btnPause.setOnClickListener {
+            gameView.pauseGame()
+        }
     }
 }
