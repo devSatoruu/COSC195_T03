@@ -60,6 +60,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!-- RESTART BUTTON -->
+    <Button
+        android:id="@+id/btnRestart"
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:backgroundTint="#C9A27B"
+        android:text="RESTART"
+        android:textColor="#5C4A2E"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.499"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.635" />
+
     <!-- SLIDE BUTTON -->
     <Button
         android:id="@+id/btnSlide"
