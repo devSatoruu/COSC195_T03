@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity() {
         gameView = findViewById(R.id.gameView)
 
         val txtScore = findViewById<TextView>(R.id.txtScore)
+        val txtCoins = findViewById<TextView>(R.id.txtCoins)
 
         val btnJump = findViewById<Button>(R.id.btnJump)
         val btnDown = findViewById<Button>(R.id.btnSlide)
@@ -27,6 +28,11 @@ class MainActivity : ComponentActivity() {
         gameView.onScoreChanged = { score ->
             txtScore.text = "Score: $score"
         }
+
+        gameView.onCoinsChanged = { coins ->
+            txtCoins.text = "Coins: $coins"
+        }
+
         gameView.onGameOver = {
             btnRestart.visibility = View.VISIBLE
             btnJump.visibility = View.INVISIBLE

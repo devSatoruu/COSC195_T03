@@ -424,7 +424,7 @@ class GameView @JvmOverloads constructor(
                     playerTop < coinBottom
 
         if (collectedCoin && !isGameOver) {
-            coins++
+            coins+= 1
             score += 10
 
             onCoinsChanged?.invoke(coins)
