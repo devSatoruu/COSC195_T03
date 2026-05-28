@@ -8,7 +8,6 @@
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="8dp">
 
-    <!-- SCORE -->
 
     <com.example.supertrex.GameView
         android:id="@+id/gameView"
@@ -22,6 +21,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
+    <!-- SCORE -->
+
     <TextView
         android:id="@+id/txtScore"
         android:layout_width="wrap_content"
@@ -34,7 +35,9 @@
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
     <!-- COINS -->
+
     <TextView
         android:id="@+id/txtCoins"
         android:layout_width="wrap_content"
@@ -49,6 +52,7 @@
         app:layout_constraintTop_toBottomOf="@+id/txtScore" />
 
     <!-- PAUSE BUTTON -->
+
     <ImageButton
         android:id="@+id/btnPause"
         android:layout_width="75dp"
@@ -64,10 +68,6 @@
         app:layout_constraintEnd_toEndOf="parent" />
 
     <!-- RESTART BUTTON -->
-
-    <!-- SLIDE BUTTON -->
-
-    <!-- JUMP BUTTON -->
 
     <ImageButton
         android:id="@+id/btnRestart"
@@ -87,6 +87,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.727" />
 
+    <!-- SLIDE BUTTON -->
+
     <ImageButton
         android:id="@+id/btnSlide"
         android:layout_width="190dp"
@@ -100,6 +102,8 @@
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- JUMP BUTTON -->
 
     <ImageButton
         android:id="@+id/btnJump"
