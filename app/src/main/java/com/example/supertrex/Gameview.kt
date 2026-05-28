@@ -4,9 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
-import android.graphics.Path
 import android.util.AttributeSet
 import android.view.View
 
@@ -19,6 +17,18 @@ class GameView @JvmOverloads constructor(
     // PAINT
     // =========================
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+
+    // =========================
+    // GAME OVER PNG
+    // =========================
+    private val gameOverBitmap: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.game_over)
+
+    // =========================
+    // BACKGROUND PNG
+    // =========================
+    private val desertBg: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.desert_bg)
 
     // =========================
     // PLAYER PNG SPRITES
@@ -46,6 +56,7 @@ class GameView @JvmOverloads constructor(
     // =========================
     private val coin: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.coin)
+
 
     // =========================
     // GAME STATES
@@ -101,18 +112,42 @@ class GameView @JvmOverloads constructor(
         // =========================
         // GROUND POSITION
         // =========================
-        val groundTop = height - 340f
+        val groundTop = height - 220f
 
         // =========================
         // MOVE BACKGROUND
         // =========================
         if (!isPaused && !isGameOver) {
-            bgOffset -= 2f * gameSpeed
+            bgOffset -= 4f * gameSpeed
 
             if (bgOffset <= -width.toFloat()) {
                 bgOffset = 0f
             }
         }
+
+        // =========================
+        // DRAW LOOPING BACKGROUND PNG
+        // =========================
+        val bgBitmap = Bitmap.createScaledBitmap(
+            desertBg,
+            width,
+            height,
+            false
+        )
+
+        canvas.drawBitmap(
+            bgBitmap,
+            bgOffset,
+            0f,
+            null
+        )
+
+        canvas.drawBitmap(
+            bgBitmap,
+            bgOffset + width,
+            0f,
+            null
+        )
 
         // =========================
         // INITIAL COIN HEIGHT
@@ -153,166 +188,6 @@ class GameView @JvmOverloads constructor(
         }
 
         // =========================
-        // SKY BACKGROUND
-        // =========================
-        canvas.drawColor(Color.rgb(232, 190, 130))
-
-        // Desert haze
-        paint.color = Color.rgb(240, 213, 168)
-        canvas.drawRect(0f, 140f, width.toFloat(), height.toFloat(), paint)
-
-        // =========================
-        // SUN
-        // =========================
-        paint.color = Color.rgb(255, 212, 75)
-        canvas.drawCircle(95f, 90f, 45f, paint)
-
-        // =========================
-        // FAR PYRAMIDS
-        // =========================
-        paint.color = Color.rgb(205, 175, 125)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width * 0.52f, groundTop)
-            lineTo(bgOffset + width * 0.68f, groundTop - 210f)
-            lineTo(bgOffset + width * 0.85f, groundTop)
-            close()
-        }, paint)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width + width * 0.52f, groundTop)
-            lineTo(bgOffset + width + width * 0.68f, groundTop - 210f)
-            lineTo(bgOffset + width + width * 0.85f, groundTop)
-            close()
-        }, paint)
-
-        // =========================
-        // MAIN PYRAMIDS
-        // =========================
-        paint.color = Color.rgb(198, 160, 88)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width * 0.12f, groundTop)
-            lineTo(bgOffset + width * 0.32f, groundTop - 330f)
-            lineTo(bgOffset + width * 0.54f, groundTop)
-            close()
-        }, paint)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width + width * 0.12f, groundTop)
-            lineTo(bgOffset + width + width * 0.32f, groundTop - 330f)
-            lineTo(bgOffset + width + width * 0.54f, groundTop)
-            close()
-        }, paint)
-
-        // =========================
-        // PYRAMID SHADOWS
-        // =========================
-        paint.color = Color.rgb(150, 120, 72)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width * 0.32f, groundTop - 330f)
-            lineTo(bgOffset + width * 0.54f, groundTop)
-            lineTo(bgOffset + width * 0.34f, groundTop)
-            close()
-        }, paint)
-
-        canvas.drawPath(Path().apply {
-            moveTo(bgOffset + width + width * 0.32f, groundTop - 330f)
-            lineTo(bgOffset + width + width * 0.54f, groundTop)
-            lineTo(bgOffset + width + width * 0.34f, groundTop)
-            close()
-        }, paint)
-
-        // =========================
-        // MOVING SAND DUNES
-        // =========================
-        paint.color = Color.rgb(224, 198, 128)
-
-        // Back dunes only
-        canvas.drawOval(
-            bgOffset - 200f,
-            groundTop - 40f,
-            bgOffset + width * 0.30f,
-            groundTop + 35f,
-            paint
-        )
-
-        canvas.drawOval(
-            bgOffset + width * 0.45f,
-            groundTop - 50f,
-            bgOffset + width * 0.85f,
-            groundTop + 35f,
-            paint
-        )
-
-        canvas.drawOval(
-            bgOffset + width - 200f,
-            groundTop - 40f,
-            bgOffset + width + width * 0.30f,
-            groundTop + 35f,
-            paint
-        )
-
-        canvas.drawOval(
-            bgOffset + width + width * 0.45f,
-            groundTop - 50f,
-            bgOffset + width + width * 0.85f,
-            groundTop + 35f,
-            paint
-        )
-
-        // =========================
-        // CLOUD
-        // =========================
-        paint.color = Color.WHITE
-        canvas.drawOval(width * 0.52f, 165f, width * 0.60f, 210f, paint)
-
-        // =========================
-        // GROUND
-        // =========================
-        paint.color = Color.rgb(210, 180, 110)
-        canvas.drawRect(0f, groundTop, width.toFloat(), height.toFloat(), paint)
-
-        // =========================
-        // GROUND DETAIL LINES
-        // =========================
-        paint.color = Color.rgb(180, 150, 95)
-        paint.strokeWidth = 3f
-
-        canvas.drawLine(
-            bgOffset,
-            groundTop + 70f,
-            bgOffset + width,
-            groundTop + 70f,
-            paint
-        )
-
-        canvas.drawLine(
-            bgOffset + width,
-            groundTop + 70f,
-            bgOffset + width * 2,
-            groundTop + 70f,
-            paint
-        )
-
-        canvas.drawLine(
-            bgOffset,
-            groundTop + 150f,
-            bgOffset + width,
-            groundTop + 150f,
-            paint
-        )
-
-        canvas.drawLine(
-            bgOffset + width,
-            groundTop + 150f,
-            bgOffset + width * 2,
-            groundTop + 150f,
-            paint
-        )
-
-        // =========================
         // MOVE OBSTACLE
         // =========================
         if (!isPaused && !isGameOver) {
@@ -331,11 +206,34 @@ class GameView @JvmOverloads constructor(
         // DRAW CACTUS OR BOMB
         // =========================
         if (obstacleType == 0) {
-            val cactusBitmap = Bitmap.createScaledBitmap(cactus, 190, 200, false)
-            canvas.drawBitmap(cactusBitmap, obstacleX, groundTop - 190f, null)
+            val cactusBitmap = Bitmap.createScaledBitmap(
+                cactus,
+                190,
+                200,
+                false
+            )
+
+            canvas.drawBitmap(
+                cactusBitmap,
+                obstacleX,
+                groundTop - 190f,
+                null
+            )
+
         } else {
-            val bombBitmap = Bitmap.createScaledBitmap(bomb, 190, 130, false)
-            canvas.drawBitmap(bombBitmap, obstacleX, groundTop - 240f, null)
+            val bombBitmap = Bitmap.createScaledBitmap(
+                bomb,
+                190,
+                130,
+                false
+            )
+
+            canvas.drawBitmap(
+                bombBitmap,
+                obstacleX,
+                groundTop - 240f,
+                null
+            )
         }
 
         // =========================
@@ -397,14 +295,29 @@ class GameView @JvmOverloads constructor(
 
         if (coinX < -100f) {
             coinX = width + 800f
-            coinY = if ((0..1).random() == 0) groundTop - 220f else groundTop - 320f
+            coinY =
+                if ((0..1).random() == 0)
+                    groundTop - 220f
+                else
+                    groundTop - 320f
         }
 
         // =========================
         // DRAW COIN
         // =========================
-        val coinBitmap = Bitmap.createScaledBitmap(coin, 130, 130, false)
-        canvas.drawBitmap(coinBitmap, coinX, coinY, null)
+        val coinBitmap = Bitmap.createScaledBitmap(
+            coin,
+            130,
+            130,
+            false
+        )
+
+        canvas.drawBitmap(
+            coinBitmap,
+            coinX,
+            coinY,
+            null
+        )
 
         // =========================
         // COIN HITBOX
@@ -424,7 +337,7 @@ class GameView @JvmOverloads constructor(
                     playerTop < coinBottom
 
         if (collectedCoin && !isGameOver) {
-            coins+= 1
+            coins += 1
             score += 10
 
             onCoinsChanged?.invoke(coins)
@@ -436,28 +349,72 @@ class GameView @JvmOverloads constructor(
         // =========================
         // DRAW PLAYER
         // =========================
-        val playerX = 80f
+        val playerX = 60f
 
         if (isSliding) {
-            val slideBitmap = Bitmap.createScaledBitmap(girlSlide, 320, 200, false)
-            canvas.drawBitmap(slideBitmap, playerX, groundTop - 200f + 20f, null)
+            val slideBitmap = Bitmap.createScaledBitmap(
+                girlSlide,
+                380,
+                240,
+                false
+            )
+
+            canvas.drawBitmap(
+                slideBitmap,
+                playerX,
+                groundTop - 240f + 30f,
+                null
+            )
+
         } else if (isJumping) {
-            val jumpBitmap = Bitmap.createScaledBitmap(girlJump, 230, 280, false)
-            canvas.drawBitmap(jumpBitmap, playerX, groundTop - 280f + 45f + jumpOffset, null)
+            val jumpBitmap = Bitmap.createScaledBitmap(
+                girlJump,
+                320,
+                380,
+                false
+            )
+
+            canvas.drawBitmap(
+                jumpBitmap,
+                playerX,
+                groundTop - 380f + 70f + jumpOffset,
+                null
+            )
+
         } else {
-            val runBitmap = Bitmap.createScaledBitmap(girlRun, 230, 280, false)
-            canvas.drawBitmap(runBitmap, playerX, groundTop - 280f + 45f, null)
+            val runBitmap = Bitmap.createScaledBitmap(
+                girlRun,
+                290,
+                340,
+                false
+            )
+
+            canvas.drawBitmap(
+                runBitmap,
+                playerX,
+                groundTop - 340f + 55f,
+                null
+            )
         }
 
         // =========================
-        // GAME OVER TEXT
+        // DRAW GAME OVER PNG
         // =========================
         if (isGameOver) {
-            paint.color = Color.RED
-            paint.textSize = 90f
-            paint.strokeWidth = 4f
 
-            canvas.drawText("GAME OVER", width / 2f - 260f, height / 2f, paint)
+            val scaledGameOver = Bitmap.createScaledBitmap(
+                gameOverBitmap,
+                700,
+                350,
+                false
+            )
+
+            canvas.drawBitmap(
+                scaledGameOver,
+                width / 2f - 350f,
+                height / 2f - 250f,
+                null
+            )
         }
 
         // =========================

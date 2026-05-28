@@ -1,10 +1,10 @@
 package com.example.supertrex
 
 import android.os.Bundle
-import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.view.View
+import android.widget.ImageButton
 
 class MainActivity : ComponentActivity() {
 
@@ -20,10 +20,10 @@ class MainActivity : ComponentActivity() {
         val txtScore = findViewById<TextView>(R.id.txtScore)
         val txtCoins = findViewById<TextView>(R.id.txtCoins)
 
-        val btnJump = findViewById<Button>(R.id.btnJump)
-        val btnDown = findViewById<Button>(R.id.btnSlide)
-        val btnPause = findViewById<Button>(R.id.btnPause)
-        val btnRestart = findViewById<Button>(R.id.btnRestart)
+        val btnJump = findViewById<ImageButton>(R.id.btnJump)
+        val btnSlide = findViewById<ImageButton>(R.id.btnSlide)
+        val btnPause = findViewById<ImageButton>(R.id.btnPause)
+        val btnRestart = findViewById<ImageButton>(R.id.btnRestart)
 
         gameView.onScoreChanged = { score ->
             txtScore.text = "Score: $score"
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
         gameView.onGameOver = {
             btnRestart.visibility = View.VISIBLE
             btnJump.visibility = View.INVISIBLE
-            btnDown.visibility = View.INVISIBLE
+            btnSlide.visibility = View.INVISIBLE
         }
 
 
@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
             gameView.jump()
         }
 
-        btnDown.setOnClickListener {
+        btnSlide.setOnClickListener {
             gameView.duck()
         }
 
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity() {
             btnRestart.visibility = View.GONE
 
             btnJump.visibility = View.VISIBLE
-            btnDown.visibility = View.VISIBLE
+            btnSlide.visibility = View.VISIBLE
         }
     }
 }
