@@ -45,11 +45,17 @@ class MainActivity : ComponentActivity() {
         }
 
         btnSlide.setOnClickListener {
-            gameView.duck()
+            gameView.slide()
         }
 
         btnPause.setOnClickListener {
             gameView.pauseGame()
+
+            if (gameView.isPausedNow()) {
+                btnPause.setImageResource(R.drawable.play_button)
+            } else {
+                btnPause.setImageResource(R.drawable.pause_button)
+            }
         }
 
         btnRestart.setOnClickListener {

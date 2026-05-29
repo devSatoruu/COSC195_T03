@@ -436,13 +436,13 @@ class GameView @JvmOverloads constructor(
     // =========================
     // SLIDE FUNCTION
     // =========================
-    fun duck() {
+    fun slide() {
         if (!isJumping && !isGameOver) {
             isSliding = true
 
             postDelayed({
                 isSliding = false
-            }, 500)
+            }, 1000)
         }
     }
 
@@ -453,6 +453,10 @@ class GameView @JvmOverloads constructor(
         if (!isGameOver) {
             isPaused = !isPaused
         }
+    }
+
+    fun isPausedNow(): Boolean {
+        return isPaused
     }
 
     // =========================
