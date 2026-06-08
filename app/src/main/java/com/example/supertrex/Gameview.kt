@@ -57,6 +57,12 @@ class GameView @JvmOverloads constructor(
     private val coin: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.coin)
 
+    // =========================
+    // advertisement PNG
+    // =========================
+    //private val ads = listOf(
+        //R.drawable.ad1
+    //)
 
     // =========================
     // GAME STATES
