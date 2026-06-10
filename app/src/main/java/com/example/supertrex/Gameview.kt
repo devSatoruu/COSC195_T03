@@ -13,26 +13,23 @@ class GameView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
-    // =========================
     // PAINT
-    // =========================
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // =========================
     // GAME OVER PNG
-    // =========================
     private val gameOverBitmap: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.game_over)
 
-    // =========================
+    // PAUSED PNG
+    private val pausedBitmap: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.paused)
+
     // BACKGROUND PNG
-    // =========================
     private val desertBg: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.desert_bg)
 
-    // =========================
+
     // PLAYER PNG SPRITES
-    // =========================
     private val girlRun: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.girl_run)
 
@@ -42,87 +39,75 @@ class GameView @JvmOverloads constructor(
     private val girlJump: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.girl_jump)
 
-    // =========================
+
     // OBSTACLE PNG SPRITES
-    // =========================
     private val cactus: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.cactus)
 
     private val bomb: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.bomb)
 
-    // =========================
+
     // COIN PNG
-    // =========================
     private val coin: Bitmap =
         BitmapFactory.decodeResource(resources, R.drawable.coin)
 
-    // =========================
+
     // advertisement PNG
-    // =========================
+
     //private val ads = listOf(
         //R.drawable.ad1
     //)
 
-    // =========================
+
     // GAME STATES
-    // =========================
     private var isPaused = false
     private var isSliding = false
     private var isGameOver = false
+    private var isGameStarted = false
 
     var onGameOver: (() -> Unit)? = null
 
-    // =========================
+
     // JUMP SYSTEM
-    // =========================
     private var isJumping = false
     private var jumpOffset = 0f
     private var jumpVelocity = 0f
     private val gravity = 2f
 
-    // =========================
+
     // SCORE SYSTEM
-    // =========================
     private var score = 0
     private var lastScoreTime = System.currentTimeMillis()
     var onScoreChanged: ((Int) -> Unit)? = null
 
-    // =========================
+
     // COIN SYSTEM
-    // =========================
     private var coinX = 1800f
     private var coinY = 0f
     private var coins = 0
     var onCoinsChanged: ((Int) -> Unit)? = null
 
-    // =========================
+
     // GAME SPEED
-    // =========================
     private var gameSpeed = 1f
 
-    // =========================
+
     // OBSTACLE SYSTEM
-    // =========================
     private var obstacleX = 1400f
     private var obstacleType = 0 // 0 = cactus, 1 = bomb
 
-    // =========================
+
     // MOVING BACKGROUND
-    // =========================
     private var bgOffset = 0f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        // =========================
         // GROUND POSITION
-        // =========================
         val groundTop = height - 220f
 
-        // =========================
         // MOVE BACKGROUND
-        // =========================
         if (!isPaused && !isGameOver) {
             bgOffset -= 4f * gameSpeed
 
@@ -131,9 +116,8 @@ class GameView @JvmOverloads constructor(
             }
         }
 
-        // =========================
+
         // DRAW LOOPING BACKGROUND PNG
-        // =========================
         val bgBitmap = Bitmap.createScaledBitmap(
             desertBg,
             width,
@@ -155,17 +139,23 @@ class GameView @JvmOverloads constructor(
             null
         )
 
-        // =========================
+        if (!isGameStarted) {
+            // Dark overlay while keeping the desert visible
+            canvas.drawARGB(150, 0, 0, 0)
+
+            invalidate()
+            return
+        }
+
+
         // INITIAL COIN HEIGHT
-        // =========================
         if (coinY == 0f) {
             coinY = groundTop - 220f
         }
 
-        // =========================
+
         // SCORE + SPEED SYSTEM
-        // =========================
-        if (!isPaused && !isGameOver) {
+        if (isGameStarted && !isPaused && !isGameOver) {
             val currentTime = System.currentTimeMillis()
 
             if (currentTime - lastScoreTime >= 1000) {
@@ -179,10 +169,9 @@ class GameView @JvmOverloads constructor(
             }
         }
 
-        // =========================
+
         // JUMP PHYSICS
-        // =========================
-        if (!isPaused && !isGameOver && isJumping) {
+        if (isGameStarted && !isPaused && !isGameOver && isJumping) {
             jumpOffset -= jumpVelocity
             jumpVelocity -= gravity
 
@@ -193,24 +182,21 @@ class GameView @JvmOverloads constructor(
             }
         }
 
-        // =========================
+
         // MOVE OBSTACLE
-        // =========================
-        if (!isPaused && !isGameOver) {
+        if (isGameStarted && !isPaused && !isGameOver) {
             obstacleX -= 12f * gameSpeed
         }
 
-        // =========================
+
         // RESET OBSTACLE
-        // =========================
         if (obstacleX < -150f) {
             obstacleX = width + 300f
             obstacleType = (0..1).random()
         }
 
-        // =========================
+
         // DRAW CACTUS OR BOMB
-        // =========================
         if (obstacleType == 0) {
             val cactusBitmap = Bitmap.createScaledBitmap(
                 cactus,
@@ -242,9 +228,8 @@ class GameView @JvmOverloads constructor(
             )
         }
 
-        // =========================
+
         // PLAYER HITBOX
-        // =========================
         val playerLeft = 135f
         val playerRight = 210f
 
@@ -262,9 +247,8 @@ class GameView @JvmOverloads constructor(
             playerBottom = groundTop - 20f
         }
 
-        // =========================
+
         // OBSTACLE HITBOX
-        // =========================
         val obstacleLeft = obstacleX + 20f
         val obstacleRight =
             if (obstacleType == 0) obstacleX + 85f
@@ -278,9 +262,8 @@ class GameView @JvmOverloads constructor(
             if (obstacleType == 0) groundTop
             else groundTop - 175f
 
-        // =========================
+
         // COLLISION DETECTION
-        // =========================
         val isColliding =
             playerRight > obstacleLeft &&
                     playerLeft < obstacleRight &&
@@ -292,10 +275,9 @@ class GameView @JvmOverloads constructor(
             onGameOver?.invoke()
         }
 
-        // =========================
+
         // MOVE COIN
-        // =========================
-        if (!isPaused && !isGameOver) {
+        if (isGameStarted && !isPaused && !isGameOver) {
             coinX -= 12f * gameSpeed
         }
 
@@ -308,9 +290,8 @@ class GameView @JvmOverloads constructor(
                     groundTop - 320f
         }
 
-        // =========================
+
         // DRAW COIN
-        // =========================
         val coinBitmap = Bitmap.createScaledBitmap(
             coin,
             130,
@@ -325,17 +306,15 @@ class GameView @JvmOverloads constructor(
             null
         )
 
-        // =========================
+
         // COIN HITBOX
-        // =========================
         val coinLeft = coinX
         val coinRight = coinX + 130f
         val coinTop = coinY
         val coinBottom = coinY + 130f
 
-        // =========================
+
         // COIN COLLECTION
-        // =========================
         val collectedCoin =
             playerRight > coinLeft &&
                     playerLeft < coinRight &&
@@ -352,9 +331,8 @@ class GameView @JvmOverloads constructor(
             coinX = width + 800f
         }
 
-        // =========================
+
         // DRAW PLAYER
-        // =========================
         val playerX = 60f
 
         if (isSliding) {
@@ -403,9 +381,8 @@ class GameView @JvmOverloads constructor(
             )
         }
 
-        // =========================
+
         // DRAW GAME OVER PNG
-        // =========================
         if (isGameOver) {
 
             val scaledGameOver = Bitmap.createScaledBitmap(
@@ -423,15 +400,32 @@ class GameView @JvmOverloads constructor(
             )
         }
 
-        // =========================
+        // DRAW PAUSED PNG
+        if (isPaused && !isGameOver && isGameStarted) {
+
+            canvas.drawARGB(150, 0, 0, 0)
+
+            val scaledPaused = Bitmap.createScaledBitmap(
+                pausedBitmap,
+                700,
+                350,
+                false
+            )
+
+            canvas.drawBitmap(
+                scaledPaused,
+                width / 2f - 350f,
+                height / 2f - 250f,
+                null
+            )
+        }
+
+
         // GAME LOOP
-        // =========================
         invalidate()
     }
 
-    // =========================
     // JUMP FUNCTION
-    // =========================
     fun jump() {
         if (!isJumping && !isSliding && !isGameOver) {
             isJumping = true
@@ -439,9 +433,8 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // =========================
+
     // SLIDE FUNCTION
-    // =========================
     fun slide() {
         if (!isJumping && !isGameOver) {
             isSliding = true
@@ -452,9 +445,8 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // =========================
+
     // PAUSE FUNCTION
-    // =========================
     fun pauseGame() {
         if (!isGameOver) {
             isPaused = !isPaused
@@ -465,9 +457,13 @@ class GameView @JvmOverloads constructor(
         return isPaused
     }
 
-    // =========================
+    fun startGame() {
+        isGameStarted = true
+        lastScoreTime = System.currentTimeMillis()
+    }
+
+
     // RESTART GAME
-    // =========================
     fun restartGame() {
         isGameOver = false
 

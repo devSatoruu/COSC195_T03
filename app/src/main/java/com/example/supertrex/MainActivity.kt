@@ -24,6 +24,11 @@ class MainActivity : ComponentActivity() {
         val btnSlide = findViewById<ImageButton>(R.id.btnSlide)
         val btnPause = findViewById<ImageButton>(R.id.btnPause)
         val btnRestart = findViewById<ImageButton>(R.id.btnRestart)
+        val btnStart = findViewById<ImageButton>(R.id.btnStart)
+
+        btnJump.visibility = View.INVISIBLE
+        btnSlide.visibility = View.INVISIBLE
+        btnPause.visibility = View.INVISIBLE
 
         gameView.onScoreChanged = { score ->
             txtScore.text = "Score: $score"
@@ -40,6 +45,18 @@ class MainActivity : ComponentActivity() {
         }
 
 
+        btnStart.setOnClickListener {
+
+            gameView.startGame()
+
+            btnStart.visibility = View.GONE
+
+            btnJump.visibility = View.VISIBLE
+            btnSlide.visibility = View.VISIBLE
+            btnPause.visibility = View.VISIBLE
+        }
+
+
         btnJump.setOnClickListener {
             gameView.jump()
         }
@@ -53,8 +70,15 @@ class MainActivity : ComponentActivity() {
 
             if (gameView.isPausedNow()) {
                 btnPause.setImageResource(R.drawable.play_button)
+
+                btnJump.visibility = View.INVISIBLE
+                btnSlide.visibility = View.INVISIBLE
+
             } else {
                 btnPause.setImageResource(R.drawable.pause_button)
+
+                btnJump.visibility = View.VISIBLE
+                btnSlide.visibility = View.VISIBLE
             }
         }
 
