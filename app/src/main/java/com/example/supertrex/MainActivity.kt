@@ -6,9 +6,7 @@ import androidx.activity.ComponentActivity
 import android.view.View
 import android.widget.ImageButton
 import android.widget.ImageView
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.bumptech.glide.Glide
 class MainActivity : ComponentActivity() {
 
     private lateinit var gameView: GameView
@@ -20,26 +18,32 @@ class MainActivity : ComponentActivity() {
 
         gameView = findViewById(R.id.gameView)
 
+        // SCORES
         val txtScore = findViewById<TextView>(R.id.txtScore)
         val txtCoins = findViewById<TextView>(R.id.txtCoins)
 
+        // BUTTONS
         val btnJump = findViewById<ImageButton>(R.id.btnJump)
         val btnSlide = findViewById<ImageButton>(R.id.btnSlide)
         val btnPause = findViewById<ImageButton>(R.id.btnPause)
         val btnRestart = findViewById<ImageButton>(R.id.btnRestart)
-
-        val imgWelcome = findViewById<ImageView>(R.id.imgWelcome)
         val btnStart = findViewById<ImageButton>(R.id.btnStart)
         val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
-
-        val imgAd = findViewById<ImageView>(R.id.imgAd)
         val btnCloseAd = findViewById<ImageButton>(R.id.btnCloseAd)
 
+        // IMAGES
+        val imgWelcome = findViewById<ImageView>(R.id.imgWelcome)
+        val imgAd = findViewById<ImageView>(R.id.imgAd)
+
+        // AD DISPLAY
         gameView.onShowAd = {
 
             imgAd.visibility = View.VISIBLE
 
-            imgAd.setImageResource(gameView.randomAd)
+            Glide.with(this)
+                .asGif()
+                .load(gameView.randomAd)
+                .into(imgAd)
 
             btnCloseAd.visibility = View.GONE
 
@@ -57,6 +61,8 @@ class MainActivity : ComponentActivity() {
         btnSlide.visibility = View.INVISIBLE
         btnPause.visibility = View.INVISIBLE
 
+
+        // SCORE DISPLAY
         gameView.onScoreChanged = { score ->
             txtScore.text = "Score: $score"
         }
@@ -65,13 +71,14 @@ class MainActivity : ComponentActivity() {
             txtCoins.text = "Coins: $coins"
         }
 
+        // GAME OVER DISPLAY
         gameView.onGameOver = {
             btnRestart.visibility = View.VISIBLE
             btnJump.visibility = View.INVISIBLE
             btnSlide.visibility = View.INVISIBLE
         }
 
-
+        // START BUTTON EVENTS
         btnStart.setOnClickListener {
 
             gameView.startGame()
@@ -85,15 +92,17 @@ class MainActivity : ComponentActivity() {
             btnPause.visibility = View.VISIBLE
         }
 
-
+        // JUMP BUTTON EVENTS
         btnJump.setOnClickListener {
             gameView.jump()
         }
 
+        // SLIDE BUTTON EVENTS
         btnSlide.setOnClickListener {
             gameView.slide()
         }
 
+        // PAUSE BUTTON EVENTS
         btnPause.setOnClickListener {
             gameView.pauseGame()
 
@@ -111,6 +120,7 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        // CLOSE BUTTON EVENTS
         btnCloseAd.setOnClickListener {
 
             imgAd.visibility = View.GONE
@@ -119,6 +129,7 @@ class MainActivity : ComponentActivity() {
             gameView.closeAd()
         }
 
+        // RESTART BUTTON EVENTS
         btnRestart.setOnClickListener {
 
             gameView.restartGame()

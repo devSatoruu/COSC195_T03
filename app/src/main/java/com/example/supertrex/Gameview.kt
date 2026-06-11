@@ -72,7 +72,6 @@ class GameView @JvmOverloads constructor(
     private var isGameStarted = false
     var onGameOver: (() -> Unit)? = null
     var onShowAd: (() -> Unit)? = null
-
     var onShowCloseButton: (() -> Unit)? = null
 
 
@@ -469,11 +468,11 @@ class GameView @JvmOverloads constructor(
         return isPaused
     }
 
+    // START FUNCTION
     fun startGame() {
         isGameStarted = true
         lastScoreTime = System.currentTimeMillis()
     }
-
 
     // RESTART GAME
     fun restartGame() {
@@ -501,6 +500,7 @@ class GameView @JvmOverloads constructor(
         enableAds = false
     }
 
+    // AD CLOSE
     fun closeAd() {
         enableAds = false
     }
@@ -517,7 +517,6 @@ class GameView @JvmOverloads constructor(
             CoroutineScope(Dispatchers.Main).launch {
                 delay(75000) // 1000 = 1 second
 
-                //TODO:x shows up here adn when clicked close the ad
                 onShowCloseButton?.invoke()
             }
         }
@@ -526,7 +525,6 @@ class GameView @JvmOverloads constructor(
             CoroutineScope(Dispatchers.Main).launch {
                 delay(12000)
 
-                //TODO:x shows up here adn when clicked close the ad
                 onShowCloseButton?.invoke()
             }
         }
@@ -535,7 +533,6 @@ class GameView @JvmOverloads constructor(
             CoroutineScope(Dispatchers.Main).launch {
                 delay(16000)
 
-                //TODO:x shows up here adn when clicked close the ad
                 onShowCloseButton?.invoke()
             }
         }
@@ -544,56 +541,8 @@ class GameView @JvmOverloads constructor(
             CoroutineScope(Dispatchers.Main).launch {
                 delay(16000)
 
-                //TODO:x shows up here adn when clicked close the ad
                 onShowCloseButton?.invoke()
             }
         }
     }
-
-    /*
-    fun advertisment()
-    {
-        if (isGameOver || isPaused || !isGameStarted)
-        {//TODO: I think this might have to be in MainActivity
-            /* this will display the ad
-            inside of into() we need to put the imageview that were using to displau the ads
-            Glide.with(this)
-                .asGif()
-                .load(randomAd)
-                .into(gameView)*/
-
-            //these if statements are here casue ads are varying lengths so we need specific durations
-            //before a x shows up
-            if (randomAd == R.drawable.ad1)
-            {//this ad is about 1:15 closer to 1:13
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(75000) // 1000 = 1 second
-
-                    //TODO:x shows up here adn when clicked close the ad
-                }
-            }
-            else if (randomAd == R.drawable.ad2)
-            {//this ad is about 12 closer to 10
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(12000)
-
-                }
-            }
-            else if (randomAd == R.drawable.ad3)
-            {//this ad is about 16 closer to 15
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(16000)
-
-                }
-            }
-            else if (randomAd == R.drawable.ad4)
-            {//this ad is about 16 closer to 15
-                CoroutineScope(Dispatchers.Main).launch {
-                    delay(16000)
-
-                }
-            }
-        }
-    }
-    */
 }

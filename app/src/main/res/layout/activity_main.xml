@@ -8,6 +8,7 @@
     tools:layout_editor_absoluteX="0dp"
     tools:layout_editor_absoluteY="8dp">
 
+    <!-- GAMEVIEW -->
 
     <com.example.supertrex.GameView
         android:id="@+id/gameView"
@@ -119,6 +120,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- WELCOME IMAGE -->
+
     <ImageView
         android:id="@+id/imgWelcome"
         android:layout_width="250dp"
@@ -147,6 +150,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"/>
 
+    <!-- SETTING BUTTON -->
+
     <ImageButton
         android:id="@+id/btnSettings"
         android:layout_width="260dp"
@@ -161,6 +166,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"/>
 
+    <!-- AD IMAGE -->
+
     <ImageView
         android:id="@+id/imgAd"
         android:layout_width="0dp"
@@ -172,6 +179,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- CLOSE BUTTON -->
 
     <ImageButton
         android:id="@+id/btnCloseAd"
