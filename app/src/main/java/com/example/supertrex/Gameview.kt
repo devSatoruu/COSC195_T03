@@ -7,6 +7,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.*
 
 class GameView @JvmOverloads constructor(
     context: Context,
@@ -53,7 +55,7 @@ class GameView @JvmOverloads constructor(
         BitmapFactory.decodeResource(resources, R.drawable.coin)
 
 
-    // advertisement GIFs
+    // advertisement stuff
 
     private val adsList = listOf(
         R.drawable.ad1,
@@ -63,6 +65,8 @@ class GameView @JvmOverloads constructor(
     )
     // Select a random ad from the list
     val randomAd = adsList.random()
+
+    private var enableAds = false
 
     // GAME STATES
     private var isPaused = false
@@ -85,6 +89,7 @@ class GameView @JvmOverloads constructor(
     private var lastScoreTime = System.currentTimeMillis()
     var onScoreChanged: ((Int) -> Unit)? = null
 
+    var scoreMultipler = 0 //since will have a shop with this i created it so this will increase and the score gathering rate will be multipled by it
 
     // COIN SYSTEM
     private var coinX = 1800f
@@ -424,6 +429,10 @@ class GameView @JvmOverloads constructor(
             )
         }
 
+        if (enableAds)
+        {
+            advertisment()//this is where teh logic will go
+        }
 
         // GAME LOOP
         invalidate()
@@ -489,5 +498,51 @@ class GameView @JvmOverloads constructor(
 
         lastScoreTime = System.currentTimeMillis()
         bgOffset = 0f
+    }
+
+    //ads function
+    fun advertisment()
+    {
+        if (isGameOver || isPaused || !isGameStarted)
+        {//TODO: I think this might have to be in MainActivity
+            /* this will display the ad
+            inside of into() we need to put the imageview that were using to displau the ads
+            Glide.with(this)
+                .asGif()
+                .load(randomAd)
+                .into(gameView)*/
+
+            //these if statements are here casue ads are varying lengths so we need specific durations
+            //before a x shows up
+            if (randomAd == R.drawable.ad1)
+            {//this ad is about 1:15 closer to 1:13
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(75000) // 1000 = 1 second
+
+                    //TODO:x shows up here adn when clicked close the ad
+                }
+            }
+            else if (randomAd == R.drawable.ad2)
+            {//this ad is about 12 closer to 10
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(12000)
+
+                }
+            }
+            else if (randomAd == R.drawable.ad3)
+            {//this ad is about 16 closer to 15
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(16000)
+
+                }
+            }
+            else if (randomAd == R.drawable.ad4)
+            {//this ad is about 16 closer to 15
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(16000)
+
+                }
+            }
+        }
     }
 }

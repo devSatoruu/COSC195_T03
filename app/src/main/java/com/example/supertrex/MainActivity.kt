@@ -5,7 +5,6 @@ import android.widget.TextView
 import androidx.activity.ComponentActivity
 import android.view.View
 import android.widget.ImageButton
-
 class MainActivity : ComponentActivity() {
 
     private lateinit var gameView: GameView
