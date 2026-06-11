@@ -89,7 +89,7 @@ class GameView @JvmOverloads constructor(
     private var lastScoreTime = System.currentTimeMillis()
     var onScoreChanged: ((Int) -> Unit)? = null
 
-    var scoreMultipler = 0 //since will have a shop with this i created it so this will increase and the score gathering rate will be multipled by it
+    var scoreMultipler = 1 //TODO: gathering rate needs to be multipeld by this number
 
     // COIN SYSTEM
     private var coinX = 1800f
