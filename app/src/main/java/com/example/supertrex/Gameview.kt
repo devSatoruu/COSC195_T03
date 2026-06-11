@@ -53,12 +53,16 @@ class GameView @JvmOverloads constructor(
         BitmapFactory.decodeResource(resources, R.drawable.coin)
 
 
-    // advertisement PNG
+    // advertisement GIFs
 
-    //private val ads = listOf(
-        //R.drawable.ad1
-    //)
-
+    private val adsList = listOf(
+        R.drawable.ad1,
+        R.drawable.ad2,
+        R.drawable.ad3,
+        R.drawable.ad4
+    )
+    // Select a random ad from the list
+    val randomAd = adsList.random()
 
     // GAME STATES
     private var isPaused = false
