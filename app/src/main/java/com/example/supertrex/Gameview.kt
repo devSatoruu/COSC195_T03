@@ -14,123 +14,172 @@ class GameView @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
-    // PAINT - used for drawing (not heavily used yet)
+    // PAINT
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
-    // GAME OVER IMAGE - shown when player loses
-    private val gameOverBitmap = BitmapFactory.decodeResource(resources, R.drawable.game_over)
+    // GAME OVER PNG
+    private val gameOverBitmap: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.game_over)
 
-    // PAUSE IMAGE - shown when game is paused
-    private val pausedBitmap = BitmapFactory.decodeResource(resources, R.drawable.paused)
+    // PAUSED PNG
+    private val pausedBitmap: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.paused)
 
-    // BACKGROUND IMAGE - scrolling desert
-    private val desertBg = BitmapFactory.decodeResource(resources, R.drawable.desert_bg)
+    // BACKGROUND PNG
+    private val desertBg: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.desert_bg)
 
-    // PLAYER SPRITES - run, jump, slide states
-    private val girlRun = BitmapFactory.decodeResource(resources, R.drawable.girl_run)
-    private val girlSlide = BitmapFactory.decodeResource(resources, R.drawable.girl_slide)
-    private val girlJump = BitmapFactory.decodeResource(resources, R.drawable.girl_jump)
+    // PLAYER PNG SPRITES
+    private val girlRun: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.girl_run)
 
-    // OBSTACLES - cactus and bomb
-    private val cactus = BitmapFactory.decodeResource(resources, R.drawable.cactus)
-    private val bomb = BitmapFactory.decodeResource(resources, R.drawable.bomb)
+    private val girlSlide: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.girl_slide)
 
-    // COIN IMAGE - collectible item
-    private val coin = BitmapFactory.decodeResource(resources, R.drawable.coin)
+    private val girlJump: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.girl_jump)
 
-    // ADS LIST - random ad selection
+
+    // OBSTACLE PNG SPRITES
+    private val cactus: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.cactus)
+
+    private val bomb: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.bomb)
+
+    // COIN PNG
+    private val coin: Bitmap =
+        BitmapFactory.decodeResource(resources, R.drawable.coin)
+
+
+    // ADVERTISEMENT STUFF
     private val adsList = listOf(
         R.drawable.ad1,
         R.drawable.ad2,
         R.drawable.ad3,
         R.drawable.ad4
     )
-
+    // Select a random ad from the list
     var randomAd = adsList.random()
         private set
 
     private var enableAds = false
 
-    // GAME STATES - controls gameplay flow
+    // GAME STATES
     private var isPaused = false
     private var isSliding = false
     private var isGameOver = false
     private var isGameStarted = false
-
-    // CALLBACKS - communicate with MainActivity
     var onGameOver: (() -> Unit)? = null
     var onShowAd: (() -> Unit)? = null
+
     var onShowCloseButton: (() -> Unit)? = null
 
-    // JUMP SYSTEM - physics variables
+
+    // JUMP SYSTEM
     private var isJumping = false
     private var jumpOffset = 0f
     private var jumpVelocity = 0f
     private val gravity = 2f
 
-    // SCORE SYSTEM - time based scoring
+
+    // SCORE SYSTEM
     private var score = 0
     private var lastScoreTime = System.currentTimeMillis()
     var onScoreChanged: ((Int) -> Unit)? = null
 
-    var scoreMultiplier = 1
+    var scoreMultiplier = 1 //TODO: gathering rate needs to be multiplied by this number
 
-    // COIN SYSTEM - tracking coins
+    // COIN SYSTEM
     private var coinX = 1800f
     private var coinY = 0f
     private var coins = 0
     var onCoinsChanged: ((Int) -> Unit)? = null
 
-    // GAME SPEED - increases difficulty over time
+
+    // GAME SPEED
     private var gameSpeed = 1f
 
-    // OBSTACLE SYSTEM - movement and type
-    private var obstacleX = 1400f
-    private var obstacleType = 0
 
-    // BACKGROUND OFFSET - scrolling effect
+    // OBSTACLE SYSTEM
+    private var obstacleX = 1400f
+    private var obstacleType = 0 // 0 = cactus, 1 = bomb
+
+
+    // MOVING BACKGROUND
     private var bgOffset = 0f
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
+        // GROUND POSITION
         val groundTop = height - 220f
 
-        // MOVE BACKGROUND - scrolling loop
+        // MOVE BACKGROUND
         if (!isPaused && !isGameOver) {
             bgOffset -= 4f * gameSpeed
-            if (bgOffset <= -width) bgOffset = 0f
+
+            if (bgOffset <= -width.toFloat()) {
+                bgOffset = 0f
+            }
         }
 
-        val bg = Bitmap.createScaledBitmap(desertBg, width, height, false)
-        canvas.drawBitmap(bg, bgOffset, 0f, null)
-        canvas.drawBitmap(bg, bgOffset + width, 0f, null)
 
-        // START SCREEN - dark overlay before game starts
+        // DRAW LOOPING BACKGROUND PNG
+        val bgBitmap = Bitmap.createScaledBitmap(
+            desertBg,
+            width,
+            height,
+            false
+        )
+
+        canvas.drawBitmap(
+            bgBitmap,
+            bgOffset,
+            0f,
+            null
+        )
+
+        canvas.drawBitmap(
+            bgBitmap,
+            bgOffset + width,
+            0f,
+            null
+        )
+
         if (!isGameStarted) {
+            // Dark overlay while keeping the desert visible
             canvas.drawARGB(150, 0, 0, 0)
+
             invalidate()
             return
         }
 
-        // INITIAL COIN POSITION
-        if (coinY == 0f) coinY = groundTop - 220f
 
-        // SCORE SYSTEM - increases every second
-        if (!isPaused && !isGameOver) {
-            val now = System.currentTimeMillis()
+        // INITIAL COIN HEIGHT
+        if (coinY == 0f) {
+            coinY = groundTop - 220f
+        }
 
-            if (now - lastScoreTime >= 1000) {
+
+        // SCORE + SPEED SYSTEM
+        if (isGameStarted && !isPaused && !isGameOver) {
+            val currentTime = System.currentTimeMillis()
+
+            if (currentTime - lastScoreTime >= 1000) {
                 score++
-                lastScoreTime = now
+                lastScoreTime = currentTime
                 onScoreChanged?.invoke(score)
 
-                if (score % 10 == 0) gameSpeed += 0.2f
+                if (score % 10 == 0) {
+                    gameSpeed += 0.2f
+                }
             }
         }
 
-        // JUMP PHYSICS - gravity system
-        if (isJumping && !isPaused && !isGameOver) {
+
+        // JUMP PHYSICS
+        if (isGameStarted && !isPaused && !isGameOver && isJumping) {
             jumpOffset -= jumpVelocity
             jumpVelocity -= gravity
 
@@ -141,57 +190,97 @@ class GameView @JvmOverloads constructor(
             }
         }
 
-        // OBSTACLE MOVEMENT
-        obstacleX -= 12f * gameSpeed
 
-        // OBSTACLE RESET
+        // MOVE OBSTACLE
+        if (isGameStarted && !isPaused && !isGameOver) {
+            obstacleX -= 12f * gameSpeed
+        }
+
+
+        // RESET OBSTACLE
         if (obstacleX < -150f) {
             obstacleX = width + 300f
             obstacleType = (0..1).random()
         }
 
-        // DRAW OBSTACLES
+
+        // DRAW CACTUS OR BOMB
         if (obstacleType == 0) {
-            val bmp = Bitmap.createScaledBitmap(cactus, 190, 200, false)
-            canvas.drawBitmap(bmp, obstacleX, groundTop - 190f, null)
+            val cactusBitmap = Bitmap.createScaledBitmap(
+                cactus,
+                190,
+                200,
+                false
+            )
+
+            canvas.drawBitmap(
+                cactusBitmap,
+                obstacleX,
+                groundTop - 190f,
+                null
+            )
+
         } else {
-            val bmp = Bitmap.createScaledBitmap(bomb, 190, 130, false)
-            canvas.drawBitmap(bmp, obstacleX, groundTop - 240f, null)
+            val bombBitmap = Bitmap.createScaledBitmap(
+                bomb,
+                190,
+                130,
+                false
+            )
+
+            canvas.drawBitmap(
+                bombBitmap,
+                obstacleX,
+                groundTop - 240f,
+                null
+            )
         }
 
-        // PLAYER HITBOX - collision area
-        val pLeft = 135f
-        val pRight = 210f
 
-        val pTop: Float
-        val pBottom: Float
+        // PLAYER HITBOX
+        val playerLeft = 135f
+        val playerRight = 210f
+
+        val playerTop: Float
+        val playerBottom: Float
 
         if (isSliding) {
-            pTop = groundTop - 85f
-            pBottom = groundTop - 10f
+            playerTop = groundTop - 85f
+            playerBottom = groundTop - 10f
         } else if (isJumping) {
-            pTop = groundTop - 210f + jumpOffset
-            pBottom = groundTop - 20f + jumpOffset
+            playerTop = groundTop - 210f + jumpOffset
+            playerBottom = groundTop - 20f + jumpOffset
         } else {
-            pTop = groundTop - 190f
-            pBottom = groundTop - 20f
+            playerTop = groundTop - 190f
+            playerBottom = groundTop - 20f
         }
 
+
         // OBSTACLE HITBOX
-        val oLeft = obstacleX + 20f
-        val oRight = if (obstacleType == 0) obstacleX + 85f else obstacleX + 70f
-        val oTop = if (obstacleType == 0) groundTop - 190f else groundTop - 245f
-        val oBottom = if (obstacleType == 0) groundTop else groundTop - 175f
+        val obstacleLeft = obstacleX + 20f
+        val obstacleRight =
+            if (obstacleType == 0) obstacleX + 85f
+            else obstacleX + 70f
 
-        // COLLISION CHECK
-        val hit =
-            pRight > oLeft &&
-                    pLeft < oRight &&
-                    pBottom > oTop &&
-                    pTop < oBottom
+        val obstacleTop =
+            if (obstacleType == 0) groundTop - 190f
+            else groundTop - 245f
 
-        if (hit && !isGameOver) {
+        val obstacleBottom =
+            if (obstacleType == 0) groundTop
+            else groundTop - 175f
+
+
+        // COLLISION DETECTION
+        val isColliding =
+            playerRight > obstacleLeft &&
+                    playerLeft < obstacleRight &&
+                    playerBottom > obstacleTop &&
+                    playerTop < obstacleBottom
+
+        if (isColliding && !isGameOver) {
             isGameOver = true
+
             enableAds = true
             randomAd = adsList.random()
 
@@ -199,31 +288,54 @@ class GameView @JvmOverloads constructor(
             onGameOver?.invoke()
         }
 
-        // COIN MOVEMENT
-        coinX -= 12f * gameSpeed
 
-        // COIN RESET
-        if (coinX < -100f) {
-            coinX = width + 800f
-            coinY = if ((0..1).random() == 0)
-                groundTop - 220f
-            else
-                groundTop - 320f
+        // MOVE COIN
+        if (isGameStarted && !isPaused && !isGameOver) {
+            coinX -= 12f * gameSpeed
         }
 
+        if (coinX < -100f) {
+            coinX = width + 800f
+            coinY =
+                if ((0..1).random() == 0)
+                    groundTop - 220f
+                else
+                    groundTop - 320f
+        }
+
+
         // DRAW COIN
-        val coinBmp = Bitmap.createScaledBitmap(coin, 130, 130, false)
-        canvas.drawBitmap(coinBmp, coinX, coinY, null)
+        val coinBitmap = Bitmap.createScaledBitmap(
+            coin,
+            130,
+            130,
+            false
+        )
+
+        canvas.drawBitmap(
+            coinBitmap,
+            coinX,
+            coinY,
+            null
+        )
+
+
+        // COIN HITBOX
+        val coinLeft = coinX
+        val coinRight = coinX + 130f
+        val coinTop = coinY
+        val coinBottom = coinY + 130f
+
 
         // COIN COLLECTION
-        val collected =
-            pRight > coinX &&
-                    pLeft < coinX + 130f &&
-                    pBottom > coinY &&
-                    pTop < coinY + 130f
+        val collectedCoin =
+            playerRight > coinLeft &&
+                    playerLeft < coinRight &&
+                    playerBottom > coinTop &&
+                    playerTop < coinBottom
 
-        if (collected && !isGameOver) {
-            coins++
+        if (collectedCoin && !isGameOver) {
+            coins += 1
             score += 10
 
             onCoinsChanged?.invoke(coins)
@@ -232,34 +344,100 @@ class GameView @JvmOverloads constructor(
             coinX = width + 800f
         }
 
+
         // DRAW PLAYER
-        val x = 60f
+        val playerX = 60f
 
         if (isSliding) {
-            canvas.drawBitmap(Bitmap.createScaledBitmap(girlSlide, 380, 240, false), x, groundTop - 240f + 30f, null)
+            val slideBitmap = Bitmap.createScaledBitmap(
+                girlSlide,
+                380,
+                240,
+                false
+            )
+
+            canvas.drawBitmap(
+                slideBitmap,
+                playerX,
+                groundTop - 240f + 30f,
+                null
+            )
+
         } else if (isJumping) {
-            canvas.drawBitmap(Bitmap.createScaledBitmap(girlJump, 320, 380, false), x, groundTop - 380f + 70f + jumpOffset, null)
+            val jumpBitmap = Bitmap.createScaledBitmap(
+                girlJump,
+                320,
+                380,
+                false
+            )
+
+            canvas.drawBitmap(
+                jumpBitmap,
+                playerX,
+                groundTop - 380f + 70f + jumpOffset,
+                null
+            )
+
         } else {
-            canvas.drawBitmap(Bitmap.createScaledBitmap(girlRun, 290, 340, false), x, groundTop - 340f + 55f, null)
+            val runBitmap = Bitmap.createScaledBitmap(
+                girlRun,
+                290,
+                340,
+                false
+            )
+
+            canvas.drawBitmap(
+                runBitmap,
+                playerX,
+                groundTop - 340f + 55f,
+                null
+            )
         }
 
-        // GAME OVER SCREEN
+
+        // DRAW GAME OVER PNG
         if (isGameOver) {
-            val bmp = Bitmap.createScaledBitmap(gameOverBitmap, 700, 350, false)
-            canvas.drawBitmap(bmp, width / 2f - 350f, height / 2f - 250f, null)
+
+            val scaledGameOver = Bitmap.createScaledBitmap(
+                gameOverBitmap,
+                700,
+                350,
+                false
+            )
+
+            canvas.drawBitmap(
+                scaledGameOver,
+                width / 2f - 350f,
+                height / 2f - 250f,
+                null
+            )
         }
 
-        // PAUSE SCREEN
-        if (isPaused && !isGameOver) {
+        // DRAW PAUSED PNG
+        if (isPaused && !isGameOver && isGameStarted) {
+
             canvas.drawARGB(150, 0, 0, 0)
-            val bmp = Bitmap.createScaledBitmap(pausedBitmap, 700, 350, false)
-            canvas.drawBitmap(bmp, width / 2f - 350f, height / 2f - 250f, null)
+
+            val scaledPaused = Bitmap.createScaledBitmap(
+                pausedBitmap,
+                700,
+                350,
+                false
+            )
+
+            canvas.drawBitmap(
+                scaledPaused,
+                width / 2f - 350f,
+                height / 2f - 250f,
+                null
+            )
         }
 
+        // GAME LOOP
         invalidate()
     }
 
-    // JUMP ACTION
+    // JUMP FUNCTION
     fun jump() {
         if (!isJumping && !isSliding && !isGameOver) {
             isJumping = true
@@ -267,33 +445,48 @@ class GameView @JvmOverloads constructor(
         }
     }
 
-    // SLIDE ACTION
+
+    // SLIDE FUNCTION
     fun slide() {
         if (!isJumping && !isGameOver) {
             isSliding = true
-            postDelayed({ isSliding = false }, 1000)
+
+            postDelayed({
+                isSliding = false
+            }, 1000)
         }
     }
 
-    // PAUSE GAME
+
+    // PAUSE FUNCTION
     fun pauseGame() {
-        if (!isGameOver) isPaused = !isPaused
+        if (!isGameOver) {
+            isPaused = !isPaused
+        }
     }
 
-    fun isPausedNow() = isPaused
+    fun isPausedNow(): Boolean {
+        return isPaused
+    }
 
-    // START GAME
     fun startGame() {
         isGameStarted = true
         lastScoreTime = System.currentTimeMillis()
     }
 
+
     // RESTART GAME
     fun restartGame() {
         isGameOver = false
+
         score = 0
+        onScoreChanged?.invoke(score)
+
         coins = 0
+        onCoinsChanged?.invoke(coins)
+
         gameSpeed = 1f
+
         obstacleX = width + 300f
         coinX = width + 800f
 
@@ -302,27 +495,105 @@ class GameView @JvmOverloads constructor(
         jumpOffset = 0f
         jumpVelocity = 0f
 
+        lastScoreTime = System.currentTimeMillis()
+        bgOffset = 0f
+
         enableAds = false
     }
 
-    // CLOSE AD
     fun closeAd() {
         enableAds = false
     }
 
-    // ADS LOGIC
-    fun advertisment() {
+    // ADS FUNCTION
+    fun advertisment()
+    {
         if (!enableAds) return
 
-        val delayTime = when (randomAd) {
-            R.drawable.ad1 -> 75000L
-            R.drawable.ad2 -> 12000L
-            else -> 16000L
-        }
+        //these if statements are here casue ads are varying lengths so we need specific durations
+        //before a x shows up
+        if (randomAd == R.drawable.ad1)
+        {//this ad is about 1:15 closer to 1:13
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(75000) // 1000 = 1 second
 
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(delayTime)
-            onShowCloseButton?.invoke()
+                //TODO:x shows up here adn when clicked close the ad
+                onShowCloseButton?.invoke()
+            }
+        }
+        else if (randomAd == R.drawable.ad2)
+        {//this ad is about 12 closer to 10
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(12000)
+
+                //TODO:x shows up here adn when clicked close the ad
+                onShowCloseButton?.invoke()
+            }
+        }
+        else if (randomAd == R.drawable.ad3)
+        {//this ad is about 16 closer to 15
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(16000)
+
+                //TODO:x shows up here adn when clicked close the ad
+                onShowCloseButton?.invoke()
+            }
+        }
+        else if (randomAd == R.drawable.ad4)
+        {//this ad is about 16 closer to 15
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(16000)
+
+                //TODO:x shows up here adn when clicked close the ad
+                onShowCloseButton?.invoke()
+            }
         }
     }
+
+    /*
+    fun advertisment()
+    {
+        if (isGameOver || isPaused || !isGameStarted)
+        {//TODO: I think this might have to be in MainActivity
+            /* this will display the ad
+            inside of into() we need to put the imageview that were using to displau the ads
+            Glide.with(this)
+                .asGif()
+                .load(randomAd)
+                .into(gameView)*/
+
+            //these if statements are here casue ads are varying lengths so we need specific durations
+            //before a x shows up
+            if (randomAd == R.drawable.ad1)
+            {//this ad is about 1:15 closer to 1:13
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(75000) // 1000 = 1 second
+
+                    //TODO:x shows up here adn when clicked close the ad
+                }
+            }
+            else if (randomAd == R.drawable.ad2)
+            {//this ad is about 12 closer to 10
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(12000)
+
+                }
+            }
+            else if (randomAd == R.drawable.ad3)
+            {//this ad is about 16 closer to 15
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(16000)
+
+                }
+            }
+            else if (randomAd == R.drawable.ad4)
+            {//this ad is about 16 closer to 15
+                CoroutineScope(Dispatchers.Main).launch {
+                    delay(16000)
+
+                }
+            }
+        }
+    }
+    */
 }

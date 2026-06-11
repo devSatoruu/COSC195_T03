@@ -1,83 +1,136 @@
 package com.example.supertrex
 
 import android.os.Bundle
-import android.view.View
-import android.widget.*
+import android.widget.TextView
 import androidx.activity.ComponentActivity
-
+import android.view.View
+import android.widget.ImageButton
+import android.widget.ImageView
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 class MainActivity : ComponentActivity() {
 
     private lateinit var gameView: GameView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        // UI ELEMENTS
         gameView = findViewById(R.id.gameView)
-        val scoreTxt = findViewById<TextView>(R.id.txtScore)
-        val coinTxt = findViewById<TextView>(R.id.txtCoins)
 
-        val jump = findViewById<ImageButton>(R.id.btnJump)
-        val slide = findViewById<ImageButton>(R.id.btnSlide)
-        val pause = findViewById<ImageButton>(R.id.btnPause)
-        val restart = findViewById<ImageButton>(R.id.btnRestart)
+        val txtScore = findViewById<TextView>(R.id.txtScore)
+        val txtCoins = findViewById<TextView>(R.id.txtCoins)
 
-        val start = findViewById<ImageButton>(R.id.btnStart)
-        val adImg = findViewById<ImageView>(R.id.imgAd)
-        val closeAd = findViewById<ImageButton>(R.id.btnCloseAd)
+        val btnJump = findViewById<ImageButton>(R.id.btnJump)
+        val btnSlide = findViewById<ImageButton>(R.id.btnSlide)
+        val btnPause = findViewById<ImageButton>(R.id.btnPause)
+        val btnRestart = findViewById<ImageButton>(R.id.btnRestart)
 
-        // SCORE UPDATE
-        gameView.onScoreChanged = { score ->
-            scoreTxt.text = "Score: $score"
-        }
+        val imgWelcome = findViewById<ImageView>(R.id.imgWelcome)
+        val btnStart = findViewById<ImageButton>(R.id.btnStart)
+        val btnSettings = findViewById<ImageButton>(R.id.btnSettings)
 
-        // COIN UPDATE
-        gameView.onCoinsChanged = { coins ->
-            coinTxt.text = "Coins: $coins"
-        }
+        val imgAd = findViewById<ImageView>(R.id.imgAd)
+        val btnCloseAd = findViewById<ImageButton>(R.id.btnCloseAd)
 
-        // GAME OVER
-        gameView.onGameOver = {
-            restart.visibility = View.VISIBLE
-        }
-
-        // SHOW AD
         gameView.onShowAd = {
-            adImg.visibility = View.VISIBLE
-            adImg.setImageResource(gameView.randomAd)
+
+            imgAd.visibility = View.VISIBLE
+
+            imgAd.setImageResource(gameView.randomAd)
+
+            btnCloseAd.visibility = View.GONE
 
             gameView.onShowCloseButton = {
+
                 runOnUiThread {
-                    closeAd.visibility = View.VISIBLE
+                    btnCloseAd.visibility = View.VISIBLE
                 }
             }
 
             gameView.advertisment()
         }
 
-        // START GAME
-        start.setOnClickListener {
-            gameView.startGame()
-            start.visibility = View.GONE
+        btnJump.visibility = View.INVISIBLE
+        btnSlide.visibility = View.INVISIBLE
+        btnPause.visibility = View.INVISIBLE
+
+        gameView.onScoreChanged = { score ->
+            txtScore.text = "Score: $score"
         }
 
-        // CONTROLS
-        jump.setOnClickListener { gameView.jump() }
-        slide.setOnClickListener { gameView.slide() }
-        pause.setOnClickListener { gameView.pauseGame() }
+        gameView.onCoinsChanged = { coins ->
+            txtCoins.text = "Coins: $coins"
+        }
 
-        // CLOSE AD
-        closeAd.setOnClickListener {
-            adImg.visibility = View.GONE
-            closeAd.visibility = View.GONE
+        gameView.onGameOver = {
+            btnRestart.visibility = View.VISIBLE
+            btnJump.visibility = View.INVISIBLE
+            btnSlide.visibility = View.INVISIBLE
+        }
+
+
+        btnStart.setOnClickListener {
+
+            gameView.startGame()
+
+            imgWelcome.visibility = View.GONE
+            btnStart.visibility = View.GONE
+            btnSettings.visibility = View.GONE
+
+            btnJump.visibility = View.VISIBLE
+            btnSlide.visibility = View.VISIBLE
+            btnPause.visibility = View.VISIBLE
+        }
+
+
+        btnJump.setOnClickListener {
+            gameView.jump()
+        }
+
+        btnSlide.setOnClickListener {
+            gameView.slide()
+        }
+
+        btnPause.setOnClickListener {
+            gameView.pauseGame()
+
+            if (gameView.isPausedNow()) {
+                btnPause.setImageResource(R.drawable.play_button)
+
+                btnJump.visibility = View.INVISIBLE
+                btnSlide.visibility = View.INVISIBLE
+
+            } else {
+                btnPause.setImageResource(R.drawable.pause_button)
+
+                btnJump.visibility = View.VISIBLE
+                btnSlide.visibility = View.VISIBLE
+            }
+        }
+
+        btnCloseAd.setOnClickListener {
+
+            imgAd.visibility = View.GONE
+            btnCloseAd.visibility = View.GONE
+
             gameView.closeAd()
         }
 
-        // RESTART GAME
-        restart.setOnClickListener {
+        btnRestart.setOnClickListener {
+
             gameView.restartGame()
-            restart.visibility = View.GONE
+            gameView.closeAd()
+
+            btnCloseAd.visibility = View.GONE
+            imgAd.visibility = View.GONE
+
+            btnRestart.visibility = View.GONE
+
+            btnJump.visibility = View.VISIBLE
+            btnSlide.visibility = View.VISIBLE
         }
     }
 }
